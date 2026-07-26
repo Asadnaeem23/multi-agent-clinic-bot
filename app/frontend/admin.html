@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Bright Smile Dental</title>
+    <meta name="description" content="Admin dashboard for managing dental clinic chats, bookings, and settings.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+                    <rect width="48" height="48" rx="14" fill="url(#sb-grad)"/>
+                    <path d="M24 12C18 12 14 16 14 20C14 24 16 26 18 28C20 30 20 32 20 34H28C28 32 28 30 30 28C32 26 34 24 34 20C34 16 30 12 24 12Z" fill="white" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="sb-grad" x1="0" y1="0" x2="48" y2="48">
+                            <stop stop-color="#6366f1"/>
+                            <stop offset="1" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1>Bright Smile</h1>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard', this)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="chats" onclick="switchSection('chats', this)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Chats</span>
+                <span class="nav-badge" id="waiting-badge" style="display:none">0</span>
+            </a>
+            <a href="#" class="nav-item" data-section="bookings" onclick="switchSection('bookings', this)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Bookings</span>
+            </a>
+            <a href="#" class="nav-item" data-section="calendar" onclick="switchSection('calendar', this)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+                <span>Calendar</span>
+            </a>
+            <a href="#" class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="nav-item" id="nav-customer-chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                <span>Customer Chat</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- ==================== DASHBOARD ==================== -->
+        <section id="section-dashboard" class="content-section active">
+            <div class="section-header">
+                <div>
+                    <h2>Dashboard Overview</h2>
+                    <p>Monitor your customer support and bookings at a glance</p>
+                </div>
+                <button class="btn btn-outline" onclick="loadDashboardStats()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Chats</span>
+                        <span class="stat-value" id="stat-total-chats">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Chats</span>
+                        <span class="stat-value" id="stat-active-chats">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Waiting Human</span>
+                        <span class="stat-value" id="stat-waiting-human">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Today's Bookings</span>
+                        <span class="stat-value" id="stat-todays-bookings">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon indigo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Bookings</span>
+                        <span class="stat-value" id="stat-total-bookings">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon teal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Scheduled</span>
+                        <span class="stat-value" id="stat-scheduled-bookings">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-24">
+                <div class="card-header">
+                    <h3>Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <button class="btn btn-outline" onclick="switchSection('chats', document.querySelector('[data-section=chats]'))">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            View Chats
+                        </button>
+                        <button class="btn btn-outline" onclick="switchSection('bookings', document.querySelector('[data-section=bookings]'))">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Manage Bookings
+                        </button>
+                        <button class="btn btn-outline" onclick="switchSection('settings', document.querySelector('[data-section=settings]'))">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4"/></svg>
+                            Update Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CHATS ==================== -->
+        <section id="section-chats" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2>Chats Management</h2>
+                    <p>View and manage customer conversations</p>
+                </div>
+            </div>
+
+            <div class="chats-layout">
+                <!-- Chat List -->
+                <div class="card chat-list-card">
+                    <div class="card-header">
+                        <h3>Conversations</h3>
+                        <select id="chat-filter-status" class="select-input" onchange="loadChats()">
+                            <option value="all">All Chats</option>
+                            <option value="active">Active</option>
+                            <option value="waiting_human">Waiting Human</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <div class="chat-list" id="chat-list">
+                            <p class="empty-state">Loading chats...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="card chat-messages-card">
+                    <div class="card-header" id="chat-detail-header">
+                        <h3 id="chat-detail-title">Select a chat</h3>
+                        <div class="chat-actions" id="chat-actions" style="display:none">
+                            <button class="btn btn-sm btn-outline" onclick="updateChatStatus('active')">Set Active</button>
+                            <button class="btn btn-sm btn-danger-outline" onclick="updateChatStatus('closed')">Close Chat</button>
+                            <button class="btn btn-sm" style="background-color: var(--danger); color: white; margin-left: 8px;" onclick="deleteChat(selectedChat.thread_id)">Delete</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="admin-messages-area" id="admin-messages-area">
+                            <p class="empty-state">Select a conversation to view messages</p>
+                        </div>
+                        <div class="admin-reply-bar" id="admin-reply-bar" style="display:none">
+                            <textarea id="admin-reply-input" placeholder="Type your reply..." rows="3"></textarea>
+                            <button class="btn btn-primary" onclick="sendAdminReply()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                Send Reply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== BOOKINGS ==================== -->
+        <section id="section-bookings" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2>Bookings Management</h2>
+                    <p>Manage customer appointments</p>
+                </div>
+                <div class="header-actions">
+                    <select id="booking-filter-status" class="select-input" onchange="loadBookings()">
+                        <option value="all">All Bookings</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openBookingModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        New Booking
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="data-table" id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Service</th>
+                                    <th>Doctor</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-tbody">
+                                <tr><td colspan="7" class="empty-state">Loading bookings...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CALENDAR ==================== -->
+        <section id="section-calendar" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2>Calendar & Blockouts</h2>
+                    <p>Manage clinic availability and blocked slots (e.g. lunch breaks, holidays)</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openBlockoutModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Block Time Slot
+                    </button>
+                </div>
+            </div>
+
+            <div class="calendar-layout">
+                <!-- Left panel: Monthly Calendar grid -->
+                <div class="card calendar-grid-card">
+                    <div class="card-header">
+                        <div class="calendar-nav-header">
+                            <button class="btn-icon" onclick="changeMonth(-1)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                            </button>
+                            <h3 id="calendar-month-year">July 2026</h3>
+                            <button class="btn-icon" onclick="changeMonth(1)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-weekdays">
+                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
+                        <div class="calendar-days" id="calendar-days-grid">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right panel: Daily detail timeline -->
+                <div class="card calendar-detail-card">
+                    <div class="card-header">
+                        <h3 id="selected-date-label">Select a date</h3>
+                    </div>
+                    <div class="card-body scroll-vertical" style="max-height: 480px; overflow-y: auto;">
+                        <div class="timeline-container" id="daily-timeline">
+                            <p class="empty-state">Select a day on the calendar to view its schedule.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SETTINGS ==================== -->
+        <section id="section-settings" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2>Business Settings</h2>
+                    <p>Configure your business information that powers the AI assistant</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Business Context</h3>
+                    <p class="card-subtitle">This information is used by the AI assistant to answer customer questions.</p>
+                </div>
+                <div class="card-body">
+                    <textarea id="business-context-textarea" class="textarea-large" rows="22" placeholder="Enter your business information here..."></textarea>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save Changes
+                        </button>
+                        <button class="btn btn-outline" onclick="resetSettings()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                            Reset to Default
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-24">
+                <div class="card-header">
+                    <h3>Tips for Business Context</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="tips-list">
+                        <li>Include all services you offer with pricing</li>
+                        <li>List all doctors/staff with their specializations</li>
+                        <li>Specify business hours and contact information</li>
+                        <li>Add policies (cancellation, payment, insurance)</li>
+                        <li>Include location and directions</li>
+                        <li>Be specific and accurate — this directly affects AI responses</li>
+                    </ul>
+                </div>
+            <div class="card mt-24">
+                <div class="card-header">
+                    <h3>API & LLM Configuration</h3>
+                    <p class="card-subtitle">Configure API keys and models for each agent. Leave an agent's API key blank to use the global key.</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Global Groq API Key <span style="font-weight:400;color:var(--text-muted)">(used as fallback when agent-specific key is empty)</span></label>
+                        <input type="password" id="cfg-groq-api-key" class="text-input" placeholder="gsk_...">
+                    </div>
+
+                    <hr style="border:none;border-top:1px solid var(--border-light);margin:20px 0;">
+
+                    <!-- Supervisor Agent -->
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Supervisor Agent — Model</label>
+                            <select id="cfg-model-supervisor" class="select-input" onchange="toggleCustomModel('supervisor')">
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Fast & Cheap)</option>
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Smart)</option>
+                                <option value="custom">Custom Model Name...</option>
+                            </select>
+                            <input type="text" id="cfg-model-supervisor-custom" class="text-input mt-8 hidden" placeholder="Enter custom model identifier">
+                        </div>
+                        <div class="form-group">
+                            <label>Supervisor Agent — API Key <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+                            <input type="password" id="cfg-apikey-supervisor" class="text-input" placeholder="Leave blank to use global key">
+                        </div>
+                    </div>
+
+                    <!-- Inquiry Agent -->
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Inquiry Agent — Model</label>
+                            <select id="cfg-model-inquiry" class="select-input" onchange="toggleCustomModel('inquiry')">
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended)</option>
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+                                <option value="custom">Custom Model Name...</option>
+                            </select>
+                            <input type="text" id="cfg-model-inquiry-custom" class="text-input mt-8 hidden" placeholder="Enter custom model identifier">
+                        </div>
+                        <div class="form-group">
+                            <label>Inquiry Agent — API Key <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+                            <input type="password" id="cfg-apikey-inquiry" class="text-input" placeholder="Leave blank to use global key">
+                        </div>
+                    </div>
+
+                    <!-- Booking Agent -->
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Booking Agent — Model</label>
+                            <select id="cfg-model-booking" class="select-input" onchange="toggleCustomModel('booking')">
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended for Tools)</option>
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+                                <option value="custom">Custom Model Name...</option>
+                            </select>
+                            <input type="text" id="cfg-model-booking-custom" class="text-input mt-8 hidden" placeholder="Enter custom model identifier">
+                        </div>
+                        <div class="form-group">
+                            <label>Booking Agent — API Key <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+                            <input type="password" id="cfg-apikey-booking" class="text-input" placeholder="Leave blank to use global key">
+                        </div>
+                    </div>
+
+                    <!-- Human Handoff Agent -->
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Human Handoff Agent — Model</label>
+                            <select id="cfg-model-human-handoff" class="select-input" onchange="toggleCustomModel('human-handoff')">
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Fast & Cheap)</option>
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                                <option value="custom">Custom Model Name...</option>
+                            </select>
+                            <input type="text" id="cfg-model-human-handoff-custom" class="text-input mt-8 hidden" placeholder="Enter custom model identifier">
+                        </div>
+                        <div class="form-group">
+                            <label>Human Handoff Agent — API Key <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+                            <input type="password" id="cfg-apikey-human-handoff" class="text-input" placeholder="Leave blank to use global key">
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveLLMConfig()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Save API & LLM Config
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="booking-modal" style="display:none">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="booking-modal-title">New Booking</h3>
+                <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="booking-edit-id">
+                <div class="form-group">
+                    <label>User</label>
+                    <select id="booking-user" class="select-input">
+                        <option value="">Select User</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Service</label>
+                    <select id="booking-service" class="select-input">
+                        <option value="">Select Service</option>
+                        <option value="Routine Check-up">Routine Check-up</option>
+                        <option value="Teeth Cleaning">Teeth Cleaning</option>
+                        <option value="Fillings">Fillings</option>
+                        <option value="Root Canal">Root Canal</option>
+                        <option value="Tooth Extraction">Tooth Extraction</option>
+                        <option value="Teeth Whitening">Teeth Whitening</option>
+                        <option value="Veneers">Veneers</option>
+                        <option value="Braces">Braces</option>
+                        <option value="Invisalign">Invisalign</option>
+                        <option value="Emergency Care">Emergency Care</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Doctor</label>
+                    <select id="booking-doctor" class="select-input">
+                        <option value="">Select Doctor</option>
+                        <option value="Dr. Ahmed Khan">Dr. Ahmed Khan</option>
+                        <option value="Dr. Ayesha Malik">Dr. Ayesha Malik</option>
+                        <option value="Dr. Hassan Ali">Dr. Hassan Ali</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Appointment Date & Time</label>
+                    <input type="datetime-local" id="booking-datetime" class="text-input">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="booking-status" class="select-input">
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="booking-notes" class="text-input" rows="3" placeholder="Optional notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeBookingModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveBooking()">Save Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blockout Modal -->
+    <div class="modal-overlay" id="blockout-modal" style="display:none">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Block Time Slot (Unavailability)</h3>
+                <button class="modal-close" onclick="closeBlockoutModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Doctor</label>
+                    <select id="blockout-doctor" class="select-input">
+                        <option value="All">All Doctors / Whole Clinic</option>
+                        <option value="Dr. Ahmed Khan">Dr. Ahmed Khan</option>
+                        <option value="Dr. Ayesha Malik">Dr. Ayesha Malik</option>
+                        <option value="Dr. Hassan Ali">Dr. Hassan Ali</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date & Time</label>
+                    <input type="datetime-local" id="blockout-start" class="text-input">
+                </div>
+                <div class="form-group">
+                    <label>End Date & Time</label>
+                    <input type="datetime-local" id="blockout-end" class="text-input">
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <input type="text" id="blockout-reason" class="text-input" placeholder="e.g. Lunch Break, Meeting, Holiday">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeBlockoutModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveBlockout()">Block Slot</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/admin.js?v=2"></script>
+</body>
+</html>
