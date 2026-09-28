@@ -2,7 +2,7 @@
 //  CHAT LOGIC — Bright Smile Dental Chatbot
 // ==========================================
 
-const API_BASE = 'http://localhost:8001/api';
+const API_BASE = `${window.location.origin}/api`;
 
 // State
 let threadId = null;
@@ -30,6 +30,12 @@ function showToast(message, type = 'info') {
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
 }
 
 // ==========================================
@@ -77,11 +83,11 @@ function addMessage(role, content, agent) {
 
     let agentBadge = '';
     if (agent) {
-        agentBadge = `<div class="message-agent">${agent}</div>`;
+        agentBadge = `<div class="message-agent">${escapeHtml(agent)}</div>`;
     }
 
     // Convert newlines to <br> for display
-    const formattedContent = content.replace(/\n/g, '<br>');
+    const formattedContent = escapeHtml(content).replace(/\n/g, '<br>');
 
     row.innerHTML = `
         <div class="message-bubble">

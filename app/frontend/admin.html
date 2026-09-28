@@ -352,21 +352,44 @@
                         <li>Be specific and accurate — this directly affects AI responses</li>
                     </ul>
                 </div>
+            </div>
             <div class="card mt-24">
                 <div class="card-header">
                     <h3>API & LLM Configuration</h3>
                     <p class="card-subtitle">Configure API keys and models for each agent. Leave an agent's API key blank to use the global key.</p>
                 </div>
                 <div class="card-body">
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Global Groq API Key</label>
+                            <input type="password" id="cfg-groq-api-key" class="text-input" placeholder="Enter to replace the saved key">
+                        </div>
+                        <div class="form-group">
+                            <label>Global OpenRouter API Key</label>
+                            <input type="password" id="cfg-openrouter-api-key" class="text-input" placeholder="Enter to replace the saved key">
+                        </div>
+                        <div class="form-group">
+                            <label>OpenRouter Site URL <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+                            <input type="url" id="cfg-openrouter-site-url" class="text-input" placeholder="https://your-site.example">
+                        </div>
+                        <div class="form-group">
+                            <label>OpenRouter App Name</label>
+                            <input type="text" id="cfg-openrouter-app-name" class="text-input" placeholder="AI Customer Support">
+                        </div>
+                    </div>
+                    <p class="card-subtitle">Saved keys are never displayed. Leave a key blank to keep it unchanged.</p>
                     <div class="form-group">
-                        <label>Global Groq API Key <span style="font-weight:400;color:var(--text-muted)">(used as fallback when agent-specific key is empty)</span></label>
-                        <input type="password" id="cfg-groq-api-key" class="text-input" placeholder="gsk_...">
+                        <label><input type="checkbox" id="cfg-clear-empty-keys"> Clear saved keys for every API key field left blank when saving</label>
                     </div>
 
                     <hr style="border:none;border-top:1px solid var(--border-light);margin:20px 0;">
 
                     <!-- Supervisor Agent -->
                     <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Supervisor Agent — Provider</label>
+                            <select id="cfg-provider-supervisor" class="select-input"><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select>
+                        </div>
                         <div class="form-group">
                             <label>Supervisor Agent — Model</label>
                             <select id="cfg-model-supervisor" class="select-input" onchange="toggleCustomModel('supervisor')">
@@ -385,6 +408,10 @@
                     <!-- Inquiry Agent -->
                     <div class="grid-2-col">
                         <div class="form-group">
+                            <label>Inquiry Agent — Provider</label>
+                            <select id="cfg-provider-inquiry" class="select-input"><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select>
+                        </div>
+                        <div class="form-group">
                             <label>Inquiry Agent — Model</label>
                             <select id="cfg-model-inquiry" class="select-input" onchange="toggleCustomModel('inquiry')">
                                 <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended)</option>
@@ -402,6 +429,10 @@
                     <!-- Booking Agent -->
                     <div class="grid-2-col">
                         <div class="form-group">
+                            <label>Booking Agent — Provider</label>
+                            <select id="cfg-provider-booking" class="select-input"><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select>
+                        </div>
+                        <div class="form-group">
                             <label>Booking Agent — Model</label>
                             <select id="cfg-model-booking" class="select-input" onchange="toggleCustomModel('booking')">
                                 <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recommended for Tools)</option>
@@ -418,6 +449,10 @@
 
                     <!-- Human Handoff Agent -->
                     <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Human Handoff Agent — Provider</label>
+                            <select id="cfg-provider-human-handoff" class="select-input"><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select>
+                        </div>
                         <div class="form-group">
                             <label>Human Handoff Agent — Model</label>
                             <select id="cfg-model-human-handoff" class="select-input" onchange="toggleCustomModel('human-handoff')">
@@ -439,6 +474,63 @@
                             Save API & LLM Config
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <div class="card mt-24">
+                <div class="card-header">
+                    <h3>Independent Guardrails</h3>
+                    <p class="card-subtitle">Runs before routing and tool access to detect prompt injection and requests outside the business scope.</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label><input type="checkbox" id="cfg-guardrails-enabled"> Enable guardrails</label>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="cfg-guardrail-heuristics-enabled"> Enable fast local checks for common injection phrases</label>
+                    </div>
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label>Guardrail Provider</label>
+                            <select id="cfg-provider-guardrail" class="select-input"><option value="groq">Groq</option><option value="openrouter">OpenRouter</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Guardrail Model</label>
+                            <select id="cfg-model-guardrail" class="select-input" onchange="toggleCustomModel('guardrail')">
+                                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+                                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                                <option value="custom">Custom model identifier...</option>
+                            </select>
+                            <input type="text" id="cfg-model-guardrail-custom" class="text-input mt-8 hidden" placeholder="For example: openai/gpt-4o-mini">
+                        </div>
+                        <div class="form-group">
+                            <label>Guardrail API Key <span style="font-weight:400;color:var(--text-muted)">(optional override)</span></label>
+                            <input type="password" id="cfg-apikey-guardrail" class="text-input" placeholder="Leave blank to use the provider's global key">
+                        </div>
+                        <div class="form-group">
+                            <label>When guardrail model fails</label>
+                            <select id="cfg-guardrail-failure-mode" class="select-input"><option value="block">Block safely</option><option value="allow">Allow the request</option></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Guardrail System Prompt</label>
+                        <textarea id="cfg-guardrail-system-prompt" class="textarea-large" rows="12"></textarea>
+                    </div>
+                    <div class="grid-2-col">
+                        <div class="form-group"><label>Prompt Injection Reply</label><textarea id="cfg-guardrail-injection-response" class="text-input" rows="4"></textarea></div>
+                        <div class="form-group"><label>Irrelevant Query Reply</label><textarea id="cfg-guardrail-irrelevant-response" class="text-input" rows="4"></textarea></div>
+                        <div class="form-group"><label>Guardrail Failure Reply</label><textarea id="cfg-guardrail-failure-response" class="text-input" rows="4"></textarea></div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveLLMConfig()">Save Guardrails</button>
+                    </div>
+                    <hr style="border:none;border-top:1px solid var(--border-light);margin:20px 0;">
+                    <div class="form-group">
+                        <label>Test a message against the saved guardrails</label>
+                        <textarea id="guardrail-test-message" class="text-input" rows="3" placeholder="Enter a safe, irrelevant, or injection-style message"></textarea>
+                    </div>
+                    <button class="btn btn-outline" onclick="testGuardrails()">Run Guardrail Test</button>
+                    <p id="guardrail-test-result" class="card-subtitle" style="margin-top:12px;"></p>
                 </div>
             </div>
         </section>

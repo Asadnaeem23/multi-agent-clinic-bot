@@ -2,7 +2,7 @@
 //  ADMIN DASHBOARD LOGIC
 // ==========================================
 
-const API_BASE = 'http://localhost:8001/api';
+const API_BASE = `${window.location.origin}/api`;
 
 // State
 let selectedChat = null;
@@ -26,6 +26,12 @@ function showToast(message, type = 'info') {
     toast.textContent = message;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
 }
 
 // ==========================================
@@ -149,8 +155,8 @@ function renderAdminMessages(messages) {
     }
 
     area.innerHTML = messages.map(msg => {
-        const formattedContent = msg.content.replace(/\n/g, '<br>');
-        const agentLabel = msg.agent ? `<div class="admin-msg-agent">${msg.agent}</div>` : '';
+        const formattedContent = escapeHtml(msg.content).replace(/\n/g, '<br>');
+        const agentLabel = msg.agent ? `<div class="admin-msg-agent">${escapeHtml(msg.agent)}</div>` : '';
         return `
             <div class="admin-msg-row ${msg.role}">
                 <div class="admin-msg-bubble">
@@ -215,8 +221,10 @@ async function sendAdminReply() {
     if (!content) return;
 
     try {
-        const res = await fetch(`${API_BASE}/chats/${selectedChat.thread_id}/reply?content=${encodeURIComponent(content)}`, {
-            method: 'POST'
+        const res = await fetch(`${API_BASE}/chats/${selectedChat.thread_id}/admin-reply`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content })
         });
         if (!res.ok) throw new Error('Failed to send reply');
         showToast('Reply sent!', 'success');
@@ -257,11 +265,11 @@ function renderBookingsTable() {
     tbody.innerHTML = allBookings.map(b => `
         <tr>
             <td>#${b.id}</td>
-            <td>${b.service}</td>
-            <td>${b.doctor}</td>
+            <td>${escapeHtml(b.service)}</td>
+            <td>${escapeHtml(b.doctor)}</td>
             <td>${new Date(b.appointment_date).toLocaleString()}</td>
             <td><span class="badge ${b.status}">${b.status}</span></td>
-            <td>${b.notes || '—'}</td>
+            <td>${b.notes ? escapeHtml(b.notes) : '—'}</td>
             <td class="actions-cell">
                 <button class="btn-icon" onclick="editBooking(${b.id})" title="Edit">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -292,7 +300,7 @@ function openBookingModal(editId = null) {
     const userSelect = document.getElementById('booking-user');
     userSelect.innerHTML = '<option value="">Select User</option>';
     allUsers.forEach(u => {
-        userSelect.innerHTML += `<option value="${u.id}">${u.name} (${u.email})</option>`;
+        userSelect.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} (${escapeHtml(u.email)})</option>`;
     });
 
     if (editId) {
@@ -418,26 +426,48 @@ async function loadSettings() {
         document.getElementById('business-context-textarea').value = contextData.business_context;
 
         const configData = await configRes.json();
+        document.getElementById('cfg-clear-empty-keys').checked = false;
         
-        // Populate Global API Key
-        document.getElementById('cfg-groq-api-key').value = configData.groq_api_key || '';
+        document.getElementById('cfg-openrouter-site-url').value = configData.openrouter_site_url || '';
+        document.getElementById('cfg-openrouter-app-name').value = configData.openrouter_app_name || '';
+        setSecretPlaceholder('cfg-groq-api-key', configData.groq_api_key_configured);
+        setSecretPlaceholder('cfg-openrouter-api-key', configData.openrouter_api_key_configured);
+
+        ['supervisor', 'inquiry', 'booking', 'human-handoff', 'guardrail'].forEach(agent => {
+            const configName = agent.replace('-', '_');
+            document.getElementById(`cfg-provider-${agent}`).value = configData[`provider_${configName}`] || 'groq';
+        });
         
         // Populate Models
         populateModelSetting('supervisor', configData.model_supervisor);
         populateModelSetting('inquiry', configData.model_inquiry);
         populateModelSetting('booking', configData.model_booking);
         populateModelSetting('human-handoff', configData.model_human_handoff);
+        populateModelSetting('guardrail', configData.model_guardrail);
 
-        // Populate Per-Agent API Keys
-        document.getElementById('cfg-apikey-supervisor').value = configData.api_key_supervisor || '';
-        document.getElementById('cfg-apikey-inquiry').value = configData.api_key_inquiry || '';
-        document.getElementById('cfg-apikey-booking').value = configData.api_key_booking || '';
-        document.getElementById('cfg-apikey-human-handoff').value = configData.api_key_human_handoff || '';
+        ['supervisor', 'inquiry', 'booking', 'human-handoff', 'guardrail'].forEach(agent => {
+            const configName = agent.replace('-', '_');
+            setSecretPlaceholder(`cfg-apikey-${agent}`, configData[`api_key_${configName}_configured`]);
+        });
+
+        document.getElementById('cfg-guardrails-enabled').checked = configData.guardrails_enabled;
+        document.getElementById('cfg-guardrail-heuristics-enabled').checked = configData.guardrail_heuristics_enabled;
+        document.getElementById('cfg-guardrail-failure-mode').value = configData.guardrail_failure_mode;
+        document.getElementById('cfg-guardrail-system-prompt').value = configData.guardrail_system_prompt;
+        document.getElementById('cfg-guardrail-injection-response').value = configData.guardrail_injection_response;
+        document.getElementById('cfg-guardrail-irrelevant-response').value = configData.guardrail_irrelevant_response;
+        document.getElementById('cfg-guardrail-failure-response').value = configData.guardrail_failure_response;
 
     } catch (err) {
         console.error('Settings load error:', err);
         showToast('Failed to load settings', 'error');
     }
+}
+
+function setSecretPlaceholder(elementId, configured) {
+    const input = document.getElementById(elementId);
+    input.value = '';
+    input.placeholder = configured ? 'Saved — enter a new value to replace it' : 'No key saved';
 }
 
 function populateModelSetting(agent, value) {
@@ -476,8 +506,6 @@ function toggleCustomModel(agent) {
 }
 
 async function saveLLMConfig() {
-    const apiKey = document.getElementById('cfg-groq-api-key').value.trim();
-    
     const getModelValue = (agent) => {
         const select = document.getElementById(`cfg-model-${agent}`);
         const customInput = document.getElementById(`cfg-model-${agent}-custom`);
@@ -491,40 +519,92 @@ async function saveLLMConfig() {
     const inquiry = getModelValue('inquiry');
     const booking = getModelValue('booking');
     const humanHandoff = getModelValue('human-handoff');
+    const guardrail = getModelValue('guardrail');
     
-    if (!supervisor || !inquiry || !booking || !humanHandoff) {
+    if (!supervisor || !inquiry || !booking || !humanHandoff || !guardrail) {
         showToast('All agent models must be configured', 'error');
         return;
     }
 
-    // Gather per-agent API keys
-    const akSupervisor = document.getElementById('cfg-apikey-supervisor').value.trim();
-    const akInquiry = document.getElementById('cfg-apikey-inquiry').value.trim();
-    const akBooking = document.getElementById('cfg-apikey-booking').value.trim();
-    const akHumanHandoff = document.getElementById('cfg-apikey-human-handoff').value.trim();
+    const requiredTextIds = [
+        'cfg-guardrail-system-prompt', 'cfg-guardrail-injection-response',
+        'cfg-guardrail-irrelevant-response', 'cfg-guardrail-failure-response'
+    ];
+    if (requiredTextIds.some(id => !document.getElementById(id).value.trim())) {
+        showToast('Guardrail prompt and reply messages cannot be blank', 'error');
+        return;
+    }
+
+    const clearEmptySecrets = document.getElementById('cfg-clear-empty-keys').checked;
+    const optionalSecret = id => {
+        const value = document.getElementById(id).value.trim();
+        return value || (clearEmptySecrets ? '' : null);
+    };
+    const provider = agent => document.getElementById(`cfg-provider-${agent}`).value;
     
     try {
         const res = await fetch(`${API_BASE}/settings/config`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                groq_api_key: apiKey || null,
+                groq_api_key: optionalSecret('cfg-groq-api-key'),
+                openrouter_api_key: optionalSecret('cfg-openrouter-api-key'),
+                openrouter_site_url: document.getElementById('cfg-openrouter-site-url').value.trim(),
+                openrouter_app_name: document.getElementById('cfg-openrouter-app-name').value.trim() || 'AI Customer Support',
+                provider_supervisor: provider('supervisor'),
+                provider_inquiry: provider('inquiry'),
+                provider_booking: provider('booking'),
+                provider_human_handoff: provider('human-handoff'),
+                provider_guardrail: provider('guardrail'),
                 model_supervisor: supervisor,
                 model_inquiry: inquiry,
                 model_booking: booking,
                 model_human_handoff: humanHandoff,
-                api_key_supervisor: akSupervisor || null,
-                api_key_inquiry: akInquiry || null,
-                api_key_booking: akBooking || null,
-                api_key_human_handoff: akHumanHandoff || null
+                model_guardrail: guardrail,
+                api_key_supervisor: optionalSecret('cfg-apikey-supervisor'),
+                api_key_inquiry: optionalSecret('cfg-apikey-inquiry'),
+                api_key_booking: optionalSecret('cfg-apikey-booking'),
+                api_key_human_handoff: optionalSecret('cfg-apikey-human-handoff'),
+                api_key_guardrail: optionalSecret('cfg-apikey-guardrail'),
+                guardrails_enabled: document.getElementById('cfg-guardrails-enabled').checked,
+                guardrail_heuristics_enabled: document.getElementById('cfg-guardrail-heuristics-enabled').checked,
+                guardrail_failure_mode: document.getElementById('cfg-guardrail-failure-mode').value,
+                guardrail_system_prompt: document.getElementById('cfg-guardrail-system-prompt').value.trim(),
+                guardrail_injection_response: document.getElementById('cfg-guardrail-injection-response').value.trim(),
+                guardrail_irrelevant_response: document.getElementById('cfg-guardrail-irrelevant-response').value.trim(),
+                guardrail_failure_response: document.getElementById('cfg-guardrail-failure-response').value.trim()
             })
         });
         
-        if (!res.ok) throw new Error('Failed to save config');
+        if (!res.ok) throw new Error(await res.text());
         showToast('API & LLM Configuration saved successfully!', 'success');
+        loadSettings();
     } catch (err) {
         console.error('Save config error:', err);
         showToast('Failed to save configurations', 'error');
+    }
+}
+
+async function testGuardrails() {
+    const message = document.getElementById('guardrail-test-message').value.trim();
+    const result = document.getElementById('guardrail-test-result');
+    if (!message) {
+        showToast('Enter a message to test', 'error');
+        return;
+    }
+    result.textContent = 'Testing...';
+    try {
+        const res = await fetch(`${API_BASE}/settings/guardrails/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        result.textContent = `${data.decision.toUpperCase()} — ${data.reason} (${data.source})`;
+    } catch (err) {
+        console.error('Guardrail test error:', err);
+        result.textContent = 'Test failed. Check the provider, API key, and model settings.';
     }
 }
 
@@ -532,8 +612,10 @@ async function saveLLMConfig() {
 async function saveSettings() {
     const context = document.getElementById('business-context-textarea').value;
     try {
-        const res = await fetch(`${API_BASE}/settings/context?new_context=${encodeURIComponent(context)}`, {
-            method: 'PUT'
+        const res = await fetch(`${API_BASE}/settings/context`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ business_context: context })
         });
         if (!res.ok) throw new Error('Failed to save');
         showToast('Business settings saved!', 'success');
@@ -724,8 +806,8 @@ function renderDailyDetail() {
                 </div>
                 <div class="slot-content">
                     <div>
-                        <div class="slot-title">${item.title}</div>
-                        <div class="slot-desc">${item.desc}</div>
+                        <div class="slot-title">${escapeHtml(item.title)}</div>
+                        <div class="slot-desc">${escapeHtml(item.desc)}</div>
                     </div>
                     ${actionBtn}
                 </div>
